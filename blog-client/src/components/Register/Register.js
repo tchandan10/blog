@@ -1,7 +1,8 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {Link, Redirect} from 'react-router-dom';
-import Header from '../Header/Header'
-
+import Header from '../Header/Header';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 class Register extends Component {
 
     constructor(props) {
@@ -11,6 +12,20 @@ class Register extends Component {
             gotoHome : false
         }
     }
+
+    Existnotify = () => toast.error("Username or Email already exists.", {
+        position: toast.POSITION.TOP_LEFT
+      });
+
+    Errornotify = () => toast.error("An error Occured , Please try again.", {
+        position: toast.POSITION.TOP_LEFT
+      });
+
+    Successnotify = () => toast.success("Success Notification !", {
+        position: toast.POSITION.TOP_CENTER
+      });
+
+
 
     handleChangefullName(e) {
         this.setState({ full_name: e.target.value });
@@ -30,6 +45,7 @@ class Register extends Component {
 
     registerUser(e) {
         e.preventDefault();
+        let that = this;
         let url = "http://localhost:3000/api/Users";
         fetch(url, {
             method: 'POST',
@@ -45,16 +61,26 @@ class Register extends Component {
             .then(data => {
                 if(data.error !=''){
                     if(data.error.statusCode==422)
-                    alert('username or email already exists');
+                    that.Existnotify;
                     else
-                    alert('an error occured please try again');
+                    that.Errornotify;
                 }else{
-                    this.setState({ users: data });
+                    that.Successnotify; 
+                    that.setState({ users: data });
                 }
                 
 
             });
     }
+
+    toastId = null;
+
+    notify = () => this.toastId = toast("Lorem ipsum dolor");
+
+    dismiss = () =>  toast.dismiss(this.toastId);
+
+    dismissAll = () =>  toast.dismiss();
+
 
     render() {
         return (
@@ -90,7 +116,8 @@ class Register extends Component {
                         </div>
                     </form>
                     <div className="text-center">Already have an account? <Link to="/login">Sign in</Link></div>
-
+                
+                    <ToastContainer autoClose={2000} />
                 </div>
             </div>
                 )
